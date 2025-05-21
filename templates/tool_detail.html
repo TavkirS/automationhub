@@ -1,0 +1,812 @@
+{% extends 'base.html' %}
+{% comment %} 
+ 
+V1======================== {% endcomment %}
+
+{% comment %} 
+{% block title %}{{ tool.name }} - Automation Testing Hub{% endblock %}
+
+{% block content %}
+<div class="container mb-5 pb-5">
+    <!-- Back button -->
+    <div class="mb-4">
+        <a href="{% url 'tools:home' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Back to All Tools
+        </a>
+    </div>
+    
+    <!-- Tool Header -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    {% if tool.logo %}
+                    <img src="{{ tool.logo.url }}" alt="{{ tool.name }} logo" class="img-fluid tool-logo">
+                    {% else %}
+                    <div class="tool-logo-placeholder d-flex align-items-center justify-content-center">
+                        <i class="fas fa-tools fa-4x text-secondary"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-10">
+                    <h1 class="mb-2">{{ tool.name }}</h1>
+                    <span class="badge rounded-pill category-badge mb-2">{{ tool.category.name }}</span>
+                    <p class="lead">{{ tool.description }}</p>
+                    <div class="mt-3">
+                        {% if tool.website_url %}
+                        <a href="{{ tool.website_url }}" target="_blank" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-globe me-1"></i>Official Website
+                        </a>
+                        {% endif %}
+                        {% if tool.github_url %}
+                        <a href="{{ tool.github_url }}" target="_blank" class="btn btn-sm btn-outline-dark">
+                            <i class="fab fa-github me-1"></i>GitHub Repository
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="toolTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="installation-tab" data-bs-toggle="tab" 
+                    data-bs-target="#installation" type="button" role="tab">
+                <i class="fas fa-download me-1"></i>Installation
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="commands-tab" data-bs-toggle="tab" 
+                    data-bs-target="#commands" type="button" role="tab">
+                <i class="fas fa-terminal me-1"></i>Commands
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="examples-tab" data-bs-toggle="tab" 
+                    data-bs-target="#examples" type="button" role="tab">
+                <i class="fas fa-code me-1"></i>Examples
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="usecases-tab" data-bs-toggle="tab" 
+                    data-bs-target="#usecases" type="button" role="tab">
+                <i class="fas fa-lightbulb me-1"></i>Use Cases
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content overflow-auto" id="toolTabsContent">
+        <!-- Installation Tab -->
+        <div class="tab-pane fade show active" id="installation" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">Installation Steps</h4>
+                </div>
+                <div class="card-body">
+                    <div class="code-block position-relative">
+                        <code>{{ tool.installation_steps|linebreaks }}</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Commands Tab -->
+        <div class="tab-pane fade" id="commands" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">Common Commands & Syntax</h4>
+                </div>
+                <div class="card-body">
+                    {% if tool.commands.all %}
+                        <div class="accordion" id="commandsAccordion">
+                            {% for command in tool.commands.all %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="command-heading-{{ command.id }}">
+                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" 
+                                            type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#command-collapse-{{ command.id }}" 
+                                            aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                                        {{ command.title }}
+                                    </button>
+                                </h2>
+                                <div id="command-collapse-{{ command.id }}" 
+                                     class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
+                                     aria-labelledby="command-heading-{{ command.id }}" 
+                                     data-bs-parent="#commandsAccordion">
+                                    <div class="accordion-body">
+                                        <p>{{ command.description }}</p>
+                                        <h6 class="mt-3">Syntax:</h6>
+                                        <div class="code-block position-relative">
+                                            <code>{{ command.syntax|linebreaks }}</code>
+                                        </div>
+                                        {% if command.example %}
+                                        <h6 class="mt-3">Example:</h6>
+                                        <div class="code-block position-relative">
+                                            <code>{{ command.example|linebreaks }}</code>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No commands available yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Examples Tab -->
+        <div class="tab-pane fade" id="examples" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">Usage Examples</h4>
+                </div>
+                <div class="card-body">
+                    {% if tool.examples.all %}
+                        <div class="accordion" id="examplesAccordion">
+                            {% for example in tool.examples.all %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="example-heading-{{ example.id }}">
+                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" 
+                                            type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#example-collapse-{{ example.id }}" 
+                                            aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                                        {{ example.title }}
+                                    </button>
+                                </h2>
+                                <div id="example-collapse-{{ example.id }}" 
+                                     class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
+                                     aria-labelledby="example-heading-{{ example.id }}" 
+                                     data-bs-parent="#examplesAccordion">
+                                    <div class="accordion-body">
+                                        <p>{{ example.description }}</p>
+                                        <div class="code-block position-relative">
+                                            <code>{{ example.code|linebreaks }}</code>
+                                        </div>
+                                        {% if example.explanation %}
+                                        <h6 class="mt-3">Explanation:</h6>
+                                        <p>{{ example.explanation }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No examples available yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Use Cases Tab -->
+        <div class="tab-pane fade" id="usecases" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">Use Cases & Advantages</h4>
+                </div>
+                <div class="card-body">
+                    {% if tool.use_cases.all %}
+                        <div class="accordion" id="usecasesAccordion">
+                            {% for use_case in tool.use_cases.all %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="usecase-heading-{{ use_case.id }}">
+                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" 
+                                            type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#usecase-collapse-{{ use_case.id }}" 
+                                            aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                                        {{ use_case.title }}
+                                    </button>
+                                </h2>
+                                <div id="usecase-collapse-{{ use_case.id }}" 
+                                     class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
+                                     aria-labelledby="usecase-heading-{{ use_case.id }}" 
+                                     data-bs-parent="#usecasesAccordion">
+                                    <div class="accordion-body">
+                                        <h6>Description:</h6>
+                                        <p>{{ use_case.description }}</p>
+                                        
+                                        <h6 class="mt-3">Advantages:</h6>
+                                        <div class="advantages">
+                                            {{ use_case.advantages|linebreaks }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No use cases available yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+    /* Ensure scrollbar is always visible to prevent layout shifts */
+    .tab-content {
+        height: auto;
+        max-height: 75vh; /* Limit height to prevent excessive scrolling */
+        overflow-y: auto;
+        padding-right: 5px; /* Add padding to accommodate scrollbar */
+    }
+    
+    /* Style for the scrollbar for WebKit browsers */
+    .tab-content::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .tab-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    
+    .tab-content::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+    
+    /* Style for accordions to prevent jumps */
+    .accordion-collapse {
+        overflow: hidden;
+    }
+    
+    /* Make copy buttons more consistent */
+    .code-block {
+        position: relative;
+        margin-right: 8px; /* Give space for the scrollbar */
+    }
+</style>
+<script>
+    // Code copying functionality for detail page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add floating button for each code block
+        document.querySelectorAll('.code-block').forEach(function(block) {
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn btn btn-sm btn-light position-absolute';
+            copyBtn.style.top = '5px';
+            copyBtn.style.right = '5px';
+            copyBtn.style.zIndex = '10';
+            copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+            block.appendChild(copyBtn);
+            
+            copyBtn.addEventListener('click', function() {
+                const codeText = block.querySelector('code').innerText;
+                navigator.clipboard.writeText(codeText)
+                    .then(() => {
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                        copyBtn.innerHTML = '<i class="fas fa-times"></i> Error!';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+                        }, 2000);
+                    });
+            });
+        });
+        
+        // Handle tab navigation from URL hash
+        const hash = window.location.hash;
+        if (hash) {
+            const tab = document.querySelector(`[data-bs-target="${hash}"]`);
+            if (tab) {
+                const tabTrigger = new bootstrap.Tab(tab);
+                tabTrigger.show();
+            }
+        }
+        
+        // Check content height and adjust container height if needed
+        function adjustContentHeight() {
+            const footer = document.querySelector('footer');
+            const content = document.querySelector('#content');
+            
+            if (footer && content) {
+                const footerTop = footer.offsetTop;
+                const windowHeight = window.innerHeight;
+                const minHeight = windowHeight - 100; // Leave some space for margins
+                
+                content.style.minHeight = minHeight + 'px';
+            }
+        }
+        
+        // Run on load and on resize
+        adjustContentHeight();
+        window.addEventListener('resize', adjustContentHeight);
+        
+        // Pre-calculate accordion heights to avoid layout shifts
+        document.querySelectorAll('.accordion-collapse').forEach(function(collapse) {
+            // Force calculate height even when hidden
+            const originalDisplay = collapse.style.display;
+            collapse.style.display = 'block';
+            collapse.style.height = 'auto';
+            const height = collapse.scrollHeight;
+            collapse.dataset.height = height + 'px';
+            collapse.style.display = originalDisplay;
+        });
+        
+        // Handle accordion opening/closing without jumps
+        document.querySelectorAll('.accordion-button').forEach(function(button) {
+            button.addEventListener('click', function() {
+                // Small timeout to let Bootstrap do its thing first
+                setTimeout(function() {
+                    // No need for additional handling - just ensuring scrollbars stay consistent
+                }, 10);
+            });
+        });
+    });
+</script>
+{% endblock %} {% endcomment %}
+
+
+
+{% comment %} 
+ 
+V2======================== {% endcomment %}
+
+{% block title %}{{ tool.name }} - Automation Testing Hub{% endblock %}
+
+{% block content %}
+<div class="container mb-5 pb-5">
+    <!-- Back button -->
+    <div class="mb-4">
+        <a href="{% url 'tools:home' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Back to All Tools
+        </a>
+    </div>
+    
+    <!-- Tool Header -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    {% if tool.logo %}
+                    <img src="{{ tool.logo.url }}" alt="{{ tool.name }} logo" class="img-fluid tool-logo">
+                    {% else %}
+                    <div class="tool-logo-placeholder d-flex align-items-center justify-content-center">
+                        <i class="fas fa-tools fa-4x text-secondary"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-10">
+                    <h1 class="mb-2">{{ tool.name }}</h1>
+                    <span class="badge rounded-pill category-badge mb-2">{{ tool.category.name }}</span>
+                    <p class="lead">{{ tool.description }}</p>
+                    <div class="mt-3">
+                        {% if tool.website_url %}
+                        <a href="{{ tool.website_url }}" target="_blank" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-globe me-1"></i>Official Website
+                        </a>
+                        {% endif %}
+                        {% if tool.github_url %}
+                        <a href="{{ tool.github_url }}" target="_blank" class="btn btn-sm btn-outline-dark">
+                            <i class="fab fa-github me-1"></i>GitHub Repository
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="toolTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="installation-tab" data-bs-toggle="tab" 
+                    data-bs-target="#installation" type="button" role="tab">
+                <i class="fas fa-download me-1"></i>Installation
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="commands-tab" data-bs-toggle="tab" 
+                    data-bs-target="#commands" type="button" role="tab">
+                <i class="fas fa-terminal me-1"></i>Commands
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="examples-tab" data-bs-toggle="tab" 
+                    data-bs-target="#examples" type="button" role="tab">
+                <i class="fas fa-code me-1"></i>Projects
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="usecases-tab" data-bs-toggle="tab" 
+                    data-bs-target="#usecases" type="button" role="tab">
+                <i class="fas fa-lightbulb me-1"></i>Use Cases
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content overflow-auto" id="toolTabsContent">
+        <!-- Installation Tab -->
+        <div class="tab-pane fade show active" id="installation" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">Installation Steps</h4>
+                </div>
+                <div class="card-body">
+                    <div class="code-block position-relative">
+                        <code>{{ tool.installation_steps|linebreaks }}</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Commands Tab -->
+        <div class="tab-pane fade" id="commands" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">Common Commands & Syntax</h4>
+                </div>
+                <div class="card-body">
+                    {% if tool.commands.all %}
+                        <div class="language-selector mb-3">
+                            <div class="btn-group" role="group" aria-label="Language selection">
+                                <button type="button" class="btn btn-outline-primary active language-btn" data-language="python">
+                                    <i class="fab fa-python me-1"></i>Python
+                                </button>
+                                <button type="button" class="btn btn-outline-primary language-btn" data-language="java">
+                                    <i class="fab fa-java me-1"></i>Java
+                                </button>
+                                <button type="button" class="btn btn-outline-primary language-btn" data-language="javascript">
+                                    <i class="fab fa-js me-1"></i>JavaScript
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion" id="commandsAccordion">
+                            {% for command in tool.commands.all %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="command-heading-{{ command.id }}">
+                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" 
+                                            type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#command-collapse-{{ command.id }}" 
+                                            aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                                        {{ command.title }}
+                                    </button>
+                                </h2>
+                                <div id="command-collapse-{{ command.id }}" 
+                                     class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
+                                     aria-labelledby="command-heading-{{ command.id }}" 
+                                     data-bs-parent="#commandsAccordion">
+                                    <div class="accordion-body">
+                                        <p class="fw-bold">{{ command.description }}</p>
+                                        
+                                        {% for lang_example in command.language_examples.all %}
+                                        <div class="language-content language-{{ lang_example.language }} {% if lang_example.language != 'python' %}d-none{% endif %}">
+                                            <h6 class="mt-3">Syntax ({{ lang_example.get_language_display }}):</h6>
+                                            <div class="code-block position-relative">
+                                                <code>{{ lang_example.syntax|linebreaks }}</code>
+                                            </div>
+                                            
+                                            {% if lang_example.example %}
+                                            <h6 class="mt-3">Example ({{ lang_example.get_language_display }}):</h6>
+                                            <div class="code-block position-relative">
+                                                <code>{{ lang_example.example|linebreaks }}</code>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        {% empty %}
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>No language examples available for this command.
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No commands available yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Examples Tab -->
+        <div class="tab-pane fade" id="examples" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">Usage Examples</h4>
+                </div>
+                <div class="card-body">
+                    {% if tool.examples.all %}
+                        <div class="language-selector mb-3">
+                            <div class="btn-group" role="group" aria-label="Example language selection">
+                                <button type="button" class="btn btn-outline-primary active example-language-btn" data-language="python">
+                                    <i class="fab fa-python me-1"></i>Python
+                                </button>
+                                <button type="button" class="btn btn-outline-primary example-language-btn" data-language="java">
+                                    <i class="fab fa-java me-1"></i>Java
+                                </button>
+                                <button type="button" class="btn btn-outline-primary example-language-btn" data-language="javascript">
+                                    <i class="fab fa-js me-1"></i>JavaScript
+                                </button>
+                                <button type="button" class="btn btn-outline-primary example-language-btn" data-language="all">
+                                    <i class="fas fa-code me-1"></i>All
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion" id="examplesAccordion">
+                            {% for example in tool.examples.all %}
+                            <div class="accordion-item example-item" data-language="{{ example.language }}">
+                                <h2 class="accordion-header" id="example-heading-{{ example.id }}">
+                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" 
+                                            type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#example-collapse-{{ example.id }}" 
+                                            aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                                        {{ example.title }} 
+                                        <span class="badge bg-secondary ms-2">{{ example.get_language_display }}</span>
+                                    </button>
+                                </h2>
+                                <div id="example-collapse-{{ example.id }}" 
+                                     class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
+                                     aria-labelledby="example-heading-{{ example.id }}" 
+                                     data-bs-parent="#examplesAccordion">
+                                    <div class="accordion-body">
+                                        <p>{{ example.description }}</p>
+                                        <div class="code-block position-relative">
+                                            <code>{{ example.code|linebreaks }}</code>
+                                        </div>
+                                        {% if example.explanation %}
+                                        <h6 class="mt-3">Explanation:</h6>
+                                        <p>{{ example.explanation }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No examples available yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Use Cases Tab -->
+        <div class="tab-pane fade" id="usecases" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">Use Cases & Advantages</h4>
+                </div>
+                <div class="card-body">
+                    {% if tool.use_cases.all %}
+                        <div class="accordion" id="usecasesAccordion">
+                            {% for use_case in tool.use_cases.all %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="usecase-heading-{{ use_case.id }}">
+                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" 
+                                            type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#usecase-collapse-{{ use_case.id }}" 
+                                            aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+                                        {{ use_case.title }}
+                                    </button>
+                                </h2>
+                                <div id="usecase-collapse-{{ use_case.id }}" 
+                                     class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
+                                     aria-labelledby="usecase-heading-{{ use_case.id }}" 
+                                     data-bs-parent="#usecasesAccordion">
+                                    <div class="accordion-body">
+                                        <h6>Description:</h6>
+                                        <p>{{ use_case.description }}</p>
+                                        
+                                        <h6 class="mt-3">Advantages:</h6>
+                                        <div class="advantages">
+                                            {{ use_case.advantages|linebreaks }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No use cases available yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+    /* Ensure scrollbar is always visible to prevent layout shifts */
+    .tab-content {
+        height: auto;
+        max-height: 75vh; /* Limit height to prevent excessive scrolling */
+        overflow-y: auto;
+        padding-right: 5px; /* Add padding to accommodate scrollbar */
+    }
+    
+    /* Style for the scrollbar for WebKit browsers */
+    .tab-content::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .tab-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    
+    .tab-content::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+    
+    /* Style for accordions to prevent jumps */
+    .accordion-collapse {
+        overflow: hidden;
+    }
+    
+    /* Make copy buttons more consistent */
+    .code-block {
+        position: relative;
+        margin-right: 8px; /* Give space for the scrollbar */
+    }
+    
+    /* Language selector buttons */
+    .language-btn.active, .example-language-btn.active {
+        z-index: 1;
+    }
+    
+    /* Badge styling for language labels */
+    .badge.bg-secondary {
+        font-size: 0.75em;
+        font-weight: normal;
+    }
+</style>
+<script>
+    // Code copying functionality for detail page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add floating button for each code block
+        document.querySelectorAll('.code-block').forEach(function(block) {
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn btn btn-sm btn-light position-absolute';
+            copyBtn.style.top = '5px';
+            copyBtn.style.right = '5px';
+            copyBtn.style.zIndex = '10';
+            copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+            block.appendChild(copyBtn);
+            
+            copyBtn.addEventListener('click', function() {
+                const codeText = block.querySelector('code').innerText;
+                navigator.clipboard.writeText(codeText)
+                    .then(() => {
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                        copyBtn.innerHTML = '<i class="fas fa-times"></i> Error!';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+                        }, 2000);
+                    });
+            });
+        });
+        
+        // Handle tab navigation from URL hash
+        const hash = window.location.hash;
+        if (hash) {
+            const tab = document.querySelector(`[data-bs-target="${hash}"]`);
+            if (tab) {
+                const tabTrigger = new bootstrap.Tab(tab);
+                tabTrigger.show();
+            }
+        }
+        
+        // Language switching for commands
+        document.querySelectorAll('.language-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                // Update button states
+                document.querySelectorAll('.language-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Get the selected language
+                const selectedLanguage = this.getAttribute('data-language');
+                
+                // Show/hide language-specific content
+                document.querySelectorAll('.language-content').forEach(function(content) {
+                    content.classList.add('d-none');
+                });
+                
+                document.querySelectorAll(`.language-${selectedLanguage}`).forEach(function(content) {
+                    content.classList.remove('d-none');
+                });
+            });
+        });
+        
+        // Language filtering for examples
+        document.querySelectorAll('.example-language-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                // Update button states
+                document.querySelectorAll('.example-language-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Get the selected language
+                const selectedLanguage = this.getAttribute('data-language');
+                
+                // Show/hide examples based on language
+                document.querySelectorAll('.example-item').forEach(function(item) {
+                    if (selectedLanguage === 'all' || item.getAttribute('data-language') === selectedLanguage) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Check content height and adjust container height if needed
+        function adjustContentHeight() {
+            const footer = document.querySelector('footer');
+            const content = document.querySelector('#content');
+            
+            if (footer && content) {
+                const footerTop = footer.offsetTop;
+                const windowHeight = window.innerHeight;
+                const minHeight = windowHeight - 100; // Leave some space for margins
+                
+                content.style.minHeight = minHeight + 'px';
+            }
+        }
+        
+        // Run on load and on resize
+        adjustContentHeight();
+        window.addEventListener('resize', adjustContentHeight);
+        
+        // Pre-calculate accordion heights to avoid layout shifts
+        document.querySelectorAll('.accordion-collapse').forEach(function(collapse) {
+            // Force calculate height even when hidden
+            const originalDisplay = collapse.style.display;
+            collapse.style.display = 'block';
+            collapse.style.height = 'auto';
+            const height = collapse.scrollHeight;
+            collapse.dataset.height = height + 'px';
+            collapse.style.display = originalDisplay;
+        });
+        
+        // Handle accordion opening/closing without jumps
+        document.querySelectorAll('.accordion-button').forEach(function(button) {
+            button.addEventListener('click', function() {
+                // Small timeout to let Bootstrap do its thing first
+                setTimeout(function() {
+                    // No need for additional handling - just ensuring scrollbars stay consistent
+                }, 10);
+            });
+        });
+    });
+</script>
+{% endblock %}
