@@ -1,0 +1,126 @@
+<!-- quiz/templates/quiz/quiz_home.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quiz Hub - Test Your Knowledge{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="text-center">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-brain text-primary me-3"></i>Quiz Hub
+                </h1>
+                <p class="lead text-muted">Test your automation testing knowledge with our comprehensive quizzes</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-layer-group text-primary me-2"></i>Quiz Categories
+            </h2>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for category in categories %}
+                <div class="col">
+                    <div class="card category-card shadow-sm h-100 border-0">
+                        <div class="card-body text-center p-4">
+                            <div class="category-icon mb-3">
+                                <i class="fas fa-folder-open fa-3x text-primary"></i>
+                            </div>
+                            <h5 class="card-title">{{ category.name }}</h5>
+                            <p class="text-muted small mb-3">{{ category.description|truncatechars:80 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-light text-dark">{{ category.quiz_count }} Quiz{{ category.quiz_count|pluralize:"es" }}</span>
+                                <a href="{% url 'quiz:category_quizzes' category.slug %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-arrow-right me-1"></i>Explore
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No quiz categories available yet.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Quizzes Section -->
+    {% if featured_quizzes %}
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-star text-warning me-2"></i>Featured Quizzes
+            </h2>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for quiz in featured_quizzes %}
+                <div class="col">
+                    <div class="card quiz-card shadow-sm h-100 border-0">
+                        <div class="card-header bg-gradient-primary text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-tag me-2"></i>{{ quiz.category.name }}
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ quiz.title }}</h5>
+                            <p class="card-text text-muted small">{{ quiz.description|truncatechars:100 }}</p>
+                            
+                            <div class="quiz-meta mb-3">
+                                <div class="d-flex justify-content-between text-muted small">
+                                    <span><i class="fas fa-question-circle me-1"></i>{{ quiz.total_questions }} Questions</span>
+                                    <span><i class="fas fa-clock me-1"></i>{{ quiz.time_limit }} min</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0">
+                            <a href="{% url 'quiz:quiz_detail' quiz.slug %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-play me-1"></i>Start Quiz
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .category-card:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    }
+    
+    .quiz-card:hover {
+        transform: translateY(-3px);
+        transition: transform 0.3s ease;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+    }
+    
+    .category-icon {
+        opacity: 0.8;
+    }
+    
+    .quiz-meta {
+        border-top: 1px solid #e9ecef;
+        border-bottom: 1px solid #e9ecef;
+        padding: 10px 0;
+    }
+</style>
+{% endblock %}

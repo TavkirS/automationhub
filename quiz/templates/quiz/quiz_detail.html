@@ -1,0 +1,139 @@
+<!-- quiz/templates/quiz/quiz_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ quiz.title }} - Quiz Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Back Button -->
+            <div class="mb-3">
+                <a href="{% url 'quiz:home' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Quiz Hub
+                </a>
+            </div>
+
+            <!-- Quiz Detail Card -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient-primary text-white text-center py-4">
+                    <h1 class="h3 mb-2">{{ quiz.title }}</h1>
+                    <span class="badge bg-light text-dark fs-6">{{ quiz.category.name }}</span>
+                </div>
+                
+                <div class="card-body p-5">
+                    <!-- Quiz Description -->
+                    <div class="mb-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-info-circle me-2"></i>About This Quiz
+                        </h5>
+                        <p class="lead">{{ quiz.description }}</p>
+                    </div>
+
+                    <!-- Quiz Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center">
+                            <div class="quiz-stat">
+                                <div class="stat-icon mb-2">
+                                    <i class="fas fa-question-circle fa-2x text-primary"></i>
+                                </div>
+                                <h4 class="text-primary">{{ quiz.total_questions }}</h4>
+                                <p class="text-muted small">Question{{ quiz.total_questions|pluralize:"s" }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="quiz-stat">
+                                <div class="stat-icon mb-2">
+                                    <i class="fas fa-clock fa-2x text-warning"></i>
+                                </div>
+                                <h4 class="text-warning">{{ quiz.time_limit }}</h4>
+                                <p class="text-muted small">Minute{{ quiz.time_limit|pluralize:"s" }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="quiz-stat">
+                                <div class="stat-icon mb-2">
+                                    <i class="fas fa-trophy fa-2x text-success"></i>
+                                </div>
+                                <h4 class="text-success">MCQ</h4>
+                                <p class="text-muted small">Format</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Instructions -->
+                    <div class="alert alert-info border-0 bg-light">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-lightbulb me-2"></i>Instructions
+                        </h6>
+                        <ul class="mb-0 small">
+                            <li>Read each question carefully before selecting an answer</li>
+                            <li>You can only select one answer per question</li>
+                            <li>Once you submit an answer, you cannot change it</li>
+                            <li>Your results will be shown immediately after completion</li>
+                            <li>Take your time - there's no rush!</li>
+                        </ul>
+                    </div>
+
+                    <!-- Start Quiz Button -->
+                    <div class="text-center mt-4">
+                        <a href="{% url 'quiz:start_quiz' quiz.slug %}" class="btn btn-primary btn-lg px-5 py-3">
+                            <i class="fas fa-play me-2"></i>Start Quiz Now
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-footer text-center bg-light">
+                    <small class="text-muted">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        Created on {{ quiz.created_at|date:"F d, Y" }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #007bff, #0056b3);
+    }
+    
+    .quiz-stat {
+        padding: 20px;
+        border-radius: 10px;
+        background: rgba(0,123,255,0.05);
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+    }
+    
+    .quiz-stat:hover {
+        transform: translateY(-3px);
+        background: rgba(0,123,255,0.1);
+    }
+    
+    .stat-icon {
+        opacity: 0.8;
+    }
+    
+    .btn-lg {
+        font-size: 1.1rem;
+        border-radius: 50px;
+        box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-lg:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+    }
+    
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

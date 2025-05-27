@@ -283,6 +283,9 @@
                             {% if not selected_category %}category-active{% endif %}">
                             <i class="fas fa-th-list me-2"></i>Show All
                         </a>
+                        <a href="{% url 'quiz:home' %}" class="list-group-item list-group-item-action ps-4">
+                            <i class="fas fa-question-circle me-2"></i>Quiz Section
+                        </a>
                         
                         <!-- Individual categories -->
                         {% for category in categories %}

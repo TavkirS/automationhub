@@ -6,6 +6,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('tools.urls')),  # Include our app's URLs
+    path('quiz/', include('quiz.urls')),  # New quiz app
+
 ]
 
 # Add static file serving in development

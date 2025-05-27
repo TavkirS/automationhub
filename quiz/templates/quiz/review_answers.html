@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Review Answers - {{ session.quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'quiz:home' %}" class="text-decoration-none"><i class="fas fa-home"></i> Quizzes</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'quiz:quiz_results' session.session_id %}" class="text-decoration-none">Results</a></li>
+                    <li class="breadcrumb-item active">Review Answers</li>
+                </ol>
+            </nav>
+
+            <!-- Quiz Header -->
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>{{ session.quiz.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Score Summary -->
+                    <div class="score-summary text-center mb-4">
+                        <h5 class="text-muted mb-3">Your Score</h5>
+                        <div class="display-4 mb-2">{{ session.score }} / {{ session.total_questions }}</div>
+                        <div class="progress bg-light" style="height: 1.5rem;">
+                            <div class="progress-bar {% if session.percentage_score >= 70 %}bg-success{% elif session.percentage_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ session.percentage_score }}%" aria-valuenow="{{ session.percentage_score }}" aria-valuemin="0" aria-valuemax="100">{{ session.percentage_score }}%</div>
+                        </div>
+                    </div>
+
+                    <!-- Questions Review -->
+                    {% for detail in answer_details %}
+                    <div class="question-card card border-0 shadow-sm mb-4">
+                        <div class="card-header {% if detail.is_correct %}bg-success{% else %}bg-danger{% endif %} text-white py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Question {{ forloop.counter }}</h5>
+                                {% if detail.is_correct %}
+                                    <span class="badge bg-light text-success"><i class="fas fa-check me-1"></i>Correct</span>
+                                {% else %}
+                                    <span class="badge bg-light text-danger"><i class="fas fa-times me-1"></i>Incorrect</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title mb-4">{{ detail.question.question_text }}</h6>
+                            
+                            <div class="choices-list">
+                                {% for choice in detail.all_choices %}
+                                <div class="choice-item p-3 mb-3 rounded-3 {% if choice == detail.selected_choice and detail.is_correct %}bg-success bg-opacity-10 border border-success{% elif choice == detail.selected_choice and not detail.is_correct %}bg-danger bg-opacity-10 border border-danger{% elif choice == detail.correct_choice and not detail.is_correct %}bg-success bg-opacity-10 border border-success{% else %}bg-light{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span>{{ choice.choice_text }}</span>
+                                        <span>
+                                            {% if choice == detail.selected_choice and detail.is_correct %}
+                                                <i class="fas fa-check-circle text-success fs-5"></i>
+                                            {% elif choice == detail.selected_choice and not detail.is_correct %}
+                                                <i class="fas fa-times-circle text-danger fs-5"></i>
+                                            {% elif choice == detail.correct_choice and choice != detail.selected_choice %}
+                                                <i class="fas fa-star text-warning fs-5"></i>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            {% if detail.question.explanation %}
+                            <div class="explanation mt-4 p-3 bg-light rounded-3 border-start border-4 border-info">
+                                <h6 class="text-info mb-2"><i class="fas fa-info-circle me-2"></i>Explanation</h6>
+                                <p class="card-text mb-0">{{ detail.question.explanation }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center mt-4">
+                <a href="{% url 'quiz:home' %}" class="btn btn-outline-primary btn-lg me-3">
+                    <i class="fas fa-home me-2"></i>Back to Quizzes
+                </a>
+                <a href="{% url 'quiz:quiz_detail' session.quiz.slug %}" class="btn btn-success btn-lg">
+                    <i class="fas fa-redo me-2"></i>Try Again
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .choice-item {
+        transition: all 0.2s ease;
+    }
+    .choice-item:hover {
+        transform: translateX(5px);
+    }
+    .card {
+        transition: all 0.3s ease;
+    }
+    .card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    .progress {
+        border-radius: 1rem;
+    }
+    .progress-bar {
+        transition: width 1.5s ease-in-out;
+    }
+    .breadcrumb-item a {
+        color: #6c757d;
+    }
+    .breadcrumb-item a:hover {
+        color: #0d6efd;
+    }
+    .question-card {
+        border-radius: 0.5rem;
+    }
+    .question-card .card-header {
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+    }
+    .explanation {
+        background-color: rgba(13, 202, 240, 0.1) !important;
+    }
+    .btn {
+        padding: 0.75rem 1.5rem;
+    }
+    .btn-lg {
+        padding: 1rem 2rem;
+    }
+</style>
+{% endblock %} 
