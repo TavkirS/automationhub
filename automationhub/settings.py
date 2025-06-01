@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-i5)xi8dqxs=9k($v3+6e8&u+v4*6as8zorc*@)e8q+#x^z*d9(')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Temporarily enable debug mode
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # Allowed Hosts
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', '*']
@@ -114,7 +114,8 @@ if 'DATABASE_URL' in os.environ:
         default=os.environ.get('DATABASE_URL'),
         conn_max_age=600,
         conn_health_checks=True,
-        ssl_require=True
+        ssl_require=True,
+        ssl_cert_reqs=False
     )
 
 
