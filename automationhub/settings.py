@@ -31,7 +31,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-i5)xi8dqxs=9k($v3+6e8
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 # Allowed Hosts
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', '*']
 
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = True
