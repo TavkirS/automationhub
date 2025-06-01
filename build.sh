@@ -5,6 +5,10 @@ set -o errexit
 # Install dependencies
 pip install -r requirements.txt
 
+# Create necessary directories
+mkdir -p staticfiles
+mkdir -p media
+
 # Run migrations
 python manage.py makemigrations tools
 python manage.py makemigrations quiz
