@@ -2,7 +2,10 @@ services:
   - type: web
     name: automationhub
     env: python
-    buildCommand: "./build.sh"
+    buildCommand: |
+      ./build.sh
+      python manage.py migrate
+      python manage.py collectstatic --noinput
     startCommand: "gunicorn automationhub.wsgi:application --bind 0.0.0.0:$PORT --log-level debug"
     envVars:
       - key: DEBUG
