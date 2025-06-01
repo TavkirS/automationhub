@@ -6,6 +6,7 @@
 
 {% block content %}
 <div class="container">
+    {% csrf_token %}
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <!-- Quiz Header -->
@@ -145,6 +146,21 @@
 
 {% block extra_js %}
 <script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const choiceCards = document.querySelectorAll('.choice-card');
     const submitBtn = document.getElementById('submitAnswer');
@@ -154,20 +170,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle choice selection
     choiceCards.forEach(card => {
         card.addEventListener('click', function() {
-            // Remove selection from all cards
             choiceCards.forEach(c => c.classList.remove('selected'));
-            
-            // Add selection to clicked card
             this.classList.add('selected');
-            
-            // Update radio button
             const radio = this.querySelector('input[type="radio"]');
             radio.checked = true;
-            
-            // Store selected choice ID
             selectedChoiceId = this.dataset.choiceId;
-            
-            // Enable submit button
             submitBtn.disabled = false;
         });
     });
@@ -179,58 +186,44 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Show loading overlay
         loadingOverlay.style.display = 'flex';
-        
-        // Disable submit button
         submitBtn.disabled = true;
 
-        // Submit answer via AJAX
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
         fetch('{% url "quiz:submit_answer" session.session_id %}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
+                'X-CSRFToken': csrftoken,
+                'Accept': 'application/json'
             },
+            credentials: 'same-origin',
             body: JSON.stringify({
                 question_id: {{ question.id }},
                 choice_id: selectedChoiceId
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                // Redirect to next question or results
                 window.location.href = data.redirect_url;
             } else {
-                alert('Error submitting answer: ' + data.error);
-                loadingOverlay.style.display = 'none';
-                submitBtn.disabled = false;
+                throw new Error(data.error || 'An error occurred');
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('An error occurred. Please try again.');
-            loadingOverlay.style.display = 'none';
             submitBtn.disabled = false;
+            loadingOverlay.style.display = 'none';
         });
     });
-
-    // Function to get CSRF token
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
 });
 </script>
 {% endblock %}

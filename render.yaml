@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: automationhub
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn automationhub.wsgi:application"
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+    autoDeploy: true 
