@@ -3,6 +3,13 @@
 set -o errexit
 
 pip install -r requirements.txt
- 
-python manage.py collectstatic --no-input
-python manage.py migrate 
+
+# Create database directory if it doesn't exist
+mkdir -p data
+
+# Run migrations
+python manage.py makemigrations
+python manage.py migrate --noinput
+
+# Collect static files
+python manage.py collectstatic --noinput 
