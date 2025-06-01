@@ -100,18 +100,15 @@ WSGI_APPLICATION = 'automationhub.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# Default to SQLite for local development
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'automationhub',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
-# Use DATABASE_URL if available (for production)
+# Use PostgreSQL in production
 if 'DATABASE_URL' in os.environ:
     DATABASES['default'] = dj_database_url.config(
         default=os.environ.get('DATABASE_URL'),
