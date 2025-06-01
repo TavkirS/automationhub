@@ -8,13 +8,27 @@ services:
     name: automationhub
     env: python
     buildCommand: |
-      chmod +x build.sh
+      # Install dependencies
       pip install -r requirements.txt
-      python manage.py makemigrations tools
-      python manage.py makemigrations quiz
+      
+      # Create necessary directories
+      mkdir -p staticfiles
+      mkdir -p media
+      
+      # Ensure database is ready
+      echo "Waiting for database..."
+      sleep 10
+      
+      # Run migrations in order
+      echo "Running migrations..."
+      python manage.py makemigrations tools --noinput
+      python manage.py makemigrations quiz --noinput
       python manage.py migrate tools --noinput
       python manage.py migrate quiz --noinput
       python manage.py migrate --noinput
+      
+      # Collect static files
+      echo "Collecting static files..."
       python manage.py collectstatic --noinput
     startCommand: "gunicorn automationhub.wsgi:application --bind 0.0.0.0:$PORT --log-level debug"
     envVars:
