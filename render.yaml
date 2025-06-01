@@ -1,16 +1,19 @@
 services:
+  - type: postgres
+    name: automationhub-db
+    plan: free
+    ipAllowList: []
+
   - type: web
     name: automationhub
     env: python
     buildCommand: |
       chmod +x build.sh
       ./build.sh
-      python manage.py migrate --noinput
-      python manage.py collectstatic --noinput
     startCommand: "gunicorn automationhub.wsgi:application --bind 0.0.0.0:$PORT --log-level debug"
     envVars:
       - key: DEBUG
-        value: True
+        value: False
       - key: PYTHON_VERSION
         value: 3.11.11
       - key: SECRET_KEY
@@ -25,9 +28,5 @@ services:
         value: "automationhub.settings"
       - key: DISABLE_COLLECTSTATIC
         value: "1"
-    autoDeploy: true
-
-  - type: postgres
-    name: automationhub-db
-    plan: free
-    ipAllowList: [] 
+    healthCheckPath: /
+    autoDeploy: true 
