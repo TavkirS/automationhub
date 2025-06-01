@@ -198,10 +198,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 'X-CSRFToken': csrftoken,
                 'Accept': 'application/json'
             },
-            credentials: 'same-origin',
             body: JSON.stringify({
-                question_id: {{ question.id }},
-                choice_id: selectedChoiceId
+                'question_id': '{{ question.id }}',
+                'choice_id': selectedChoiceId
             })
         })
         .then(response => {
