@@ -3,10 +3,10 @@ services:
     name: automationhub
     env: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn automationhub.wsgi:application --bind 0.0.0.0:$PORT"
+    startCommand: "gunicorn automationhub.wsgi:application --bind 0.0.0.0:$PORT --log-level debug"
     envVars:
       - key: DEBUG
-        value: False
+        value: True
       - key: PYTHON_VERSION
         value: 3.12.0
       - key: SECRET_KEY
