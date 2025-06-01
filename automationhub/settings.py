@@ -102,16 +102,21 @@ WSGI_APPLICATION = 'automationhub.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'automationhub',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
-# If DATABASE_URL is set, use it (for production)
+# Use DATABASE_URL if available (for production)
 if 'DATABASE_URL' in os.environ:
     DATABASES['default'] = dj_database_url.config(
-        default=os.path.join(BASE_DIR, 'db.sqlite3'),
-        conn_max_age=600
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
     )
 
 
