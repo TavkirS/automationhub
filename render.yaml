@@ -15,11 +15,12 @@ services:
       mkdir -p staticfiles
       mkdir -p media
       
-      # Initialize database
-      python manage.py init_db
-      
-      # Run migrations
+      # Run migrations first
+      python manage.py makemigrations
       python manage.py migrate
+      
+      # Initialize database with data
+      python manage.py init_db
       
       # Collect static files
       python manage.py collectstatic --noinput
