@@ -1,11 +1,11 @@
 services:
   - type: postgres
-    name: automationhub-db
+    name: automationhub-db-new
     plan: free
     ipAllowList: []
 
   - type: web
-    name: automationhub
+    name: automationhub-new
     env: python
     buildCommand: |
       # Install dependencies
@@ -33,7 +33,7 @@ services:
         generateValue: true
       - key: DATABASE_URL
         fromDatabase:
-          name: automationhub-db
+          name: automationhub-db-new
           property: connectionString
       - key: ALLOWED_HOSTS
         value: ".onrender.com"
